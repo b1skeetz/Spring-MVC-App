@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/people")
 public class PeopleController {
-
-
     private final PersonDAO personDAO;
 
     @Autowired
@@ -30,6 +28,7 @@ public class PeopleController {
         model.addAttribute("person", personDAO.show(id));
         return "people/show";
     }
+
 
     @GetMapping("/new")
     public String newPerson(@ModelAttribute("person") Person person){
