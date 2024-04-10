@@ -29,6 +29,13 @@ public class PeopleController {
         return "people/show";
     }
 
+    public String update(){
+        return null;
+    }
+
+    public String delete(){
+        return null;
+    }
 
     @GetMapping("/new")
     public String newPerson(@ModelAttribute("person") Person person){
