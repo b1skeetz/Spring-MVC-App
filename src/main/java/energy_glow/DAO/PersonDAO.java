@@ -17,7 +17,7 @@ public class PersonDAO {
 
     private static Connection connection;
 
-    static{
+    static {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
@@ -31,7 +31,7 @@ public class PersonDAO {
         }
     }
 
-    public List<Person> index(){
+    public List<Person> index() {
         List<Person> people = new ArrayList<>();
 
         try {
@@ -39,7 +39,7 @@ public class PersonDAO {
             String SQL = "SELECT * FROM Person";
             ResultSet resultSet = statement.executeQuery(SQL);
 
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 Person person = new Person();
 
                 person.setId(resultSet.getInt("id"));
@@ -57,17 +57,18 @@ public class PersonDAO {
         return people;
     }
 
-    public Person show(int id){
+    public Person show(int id) {
         //return people.stream().filter(person -> person.getId() == id).findAny().orElse(null);
         return null;
     }
 
-    public void save(Person person){
+    public void save(Person person) {
         try {
-            Statement statement = connection.createStatement();
-            String SQL = String.format("INSERT INTO Person (name, age, email) VALUES('%s', %d, '%s');", person.getName(),
-                    person.getAge(), person.getEmail());
-            statement.executeUpdate(SQL);
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO Person (name, age, email) VALUES(?, ?, ?)");
+            statement.setString(1, person.getName());
+            statement.setInt(2, person.getAge());
+            statement.setString(3, person.getEmail());
+            statement.executeUpdate();
 
 
         } catch (SQLException e) {
@@ -76,13 +77,28 @@ public class PersonDAO {
 
     }
 
-    public void update(int id, Person updatedPerson){
-//        Person personToBeUpdated = show(id);
-//        personToBeUpdated.setName(updatedPerson.getName());
-//        personToBeUpdated.setAge(updatedPerson.getAge());
-//        personToBeUpdated.setEmail(updatedPerson.getEmail());
+    public void update(int id, Person updatedPerson) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("UPDATE person SET name = ?, age = ?, email = ? where id = ?");
+            statement.setString(1, updatedPerson.getName());
+            statement.setInt(2, updatedPerson.getAge());
+            statement.setString(3, updatedPerson.getEmail());
+            statement.setInt(4, id);
+            statement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
     }
-    public void delete(int id){
-        //people.removeIf(p -> p.getId() == id);
+
+    public void delete(int id) {
+        try{
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM person WHERE id = ?");
+            statement.setInt(1, id);
+            statement.executeUpdate();
+
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }
