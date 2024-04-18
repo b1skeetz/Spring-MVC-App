@@ -32,7 +32,7 @@ public class PeopleController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id){
+    public String edit(@PathVariable("id") int id, Model model){
         model.addAttribute("person", personDAO.show(id));
         return "people/edit";
     }

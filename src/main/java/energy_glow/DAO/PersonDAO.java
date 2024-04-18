@@ -58,8 +58,23 @@ public class PersonDAO {
     }
 
     public Person show(int id) {
+        Person person;
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM person where id = ?");
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            resultSet.next();
+            person = new Person();
+            person.setId(resultSet.getInt("id"));
+            person.setAge(resultSet.getInt("age"));
+            person.setName(resultSet.getString("name"));
+            person.setEmail(resultSet.getString("email"));
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
         //return people.stream().filter(person -> person.getId() == id).findAny().orElse(null);
-        return null;
+        return person;
     }
 
     public void save(Person person) {
@@ -69,8 +84,6 @@ public class PersonDAO {
             statement.setInt(2, person.getAge());
             statement.setString(3, person.getEmail());
             statement.executeUpdate();
-
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -85,19 +98,18 @@ public class PersonDAO {
             statement.setString(3, updatedPerson.getEmail());
             statement.setInt(4, id);
             statement.executeUpdate();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void delete(int id) {
-        try{
+        try {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM person WHERE id = ?");
             statement.setInt(1, id);
             statement.executeUpdate();
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
