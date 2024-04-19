@@ -1,3 +1,4 @@
+drop table Person;
 create table Person(
                        id serial8 primary key,
                        name varchar(30),
