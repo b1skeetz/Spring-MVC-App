@@ -12,8 +12,9 @@ target/
 *.iws
 *.iml
 *.ipr
+src/main/resources/database.properties
 
-### Eclipse ###
+### Eclipse ###q
 .apt_generated
 .classpath
 .factorypath
