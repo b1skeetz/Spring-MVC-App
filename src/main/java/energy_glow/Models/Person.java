@@ -1,9 +1,6 @@
 package energy_glow.Models;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,13 +20,20 @@ public class Person {
     @Email
     private String email;
 
+    // Country, City, Postal code (6 digits)
+    @NotEmpty(message = "Address can't be empty")
+    @Pattern(regexp = "[A-Z]\\w+,\\s[A-Z]\\w+,\\s\\d{6}", message = "Your address should be in this format: " +
+            "Country, City, Postal Code (6 digits)")
+    private String address;
+
     public Person(){
 
     }
-    public Person(int id, String name, int age, String email) {
+    public Person(int id, String name, int age, String email, String address) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.email = email;
+        this.address = address;
     }
 }
