@@ -1,11 +1,12 @@
 package energy_glow.DAO;
 
 import energy_glow.Models.Person;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,88 +15,59 @@ import java.util.Optional;
 
 @Component
 public class PersonDAO {
-    private final JdbcTemplate jdbcTemplate;
+
+    private final EntityManagerFactory managerFactory;
 
     @Autowired
-    public PersonDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public PersonDAO(EntityManagerFactory managerFactory) {
+        this.managerFactory = managerFactory;
     }
 
+    @Transactional(readOnly = true)
     public List<Person> index() {
-        return jdbcTemplate.query("SELECT * FROM Person", new BeanPropertyRowMapper<>(Person.class));
+        EntityManager manager = managerFactory.createEntityManager();
+
+        return manager.createQuery("select p from Person p", Person.class).getResultList();
     }
 
-    public Person show(int id) {
-        return jdbcTemplate.query("SELECT * FROM Person WHERE id = ?", new Object[]{id}, new BeanPropertyRowMapper<>(Person.class))
-                .stream().findAny().orElse(null);
+    @Transactional(readOnly = true)
+    public Person show(Long id) {
+        EntityManager manager = managerFactory.createEntityManager();
+        return manager.createQuery("select p from Person p where p.id = :personId", Person.class)
+                .setParameter("personId", id).getSingleResult();
     }
 
-    public Optional<Person> show(String email){
-        return jdbcTemplate.query("SELECT * FROM Person WHERE email = ?", new Object[]{email}, new BeanPropertyRowMapper<>(Person.class))
-                .stream().findAny();
-    }
-
+    @Transactional
     public void save(Person person) {
-        jdbcTemplate.update("INSERT INTO Person (name, age, email, address) VALUES (?, ?, ?, ?)", person.getName(), person.getAge(),
-                person.getEmail(), person.getAddress());
+        EntityManager manager = managerFactory.createEntityManager();
+        manager.persist(person);
     }
 
-    public void update(int id, Person updatedPerson) {
-        jdbcTemplate.update("UPDATE Person SET name = ?, age = ?, email = ?, address = ? WHERE id = ?", updatedPerson.getName(),
-                updatedPerson.getAge(), updatedPerson.getEmail(), updatedPerson.getAddress(), id);
+    @Transactional
+    public void update(Long id, Person updatedPerson) {
+        EntityManager manager = managerFactory.createEntityManager();
+        Query updatePerson = manager.createQuery("update Person p set " +
+                " p.age = :age," +
+                " p.name = :name," +
+                " p.address = :address," +
+                " p.email = :email where p.id = :id");
+
+        updatePerson.setParameter("age", updatedPerson.getAge());
+        updatePerson.setParameter("name", updatedPerson.getName());
+        updatePerson.setParameter("address", updatedPerson.getAddress());
+        updatePerson.setParameter("email", updatedPerson.getEmail());
+        updatePerson.setParameter("email", updatedPerson.getEmail());
+        updatePerson.setParameter("id", id);
+
+        updatePerson.executeUpdate();
     }
 
-    public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM person WHERE id = ?", id);
+    @Transactional
+    public void delete(Long id) {
+        EntityManager manager = managerFactory.createEntityManager();
+        Person person = manager.createQuery("select p from Person p where p.id = :personId", Person.class)
+                .setParameter("personId", id).getSingleResult();
+        manager.remove(person);
     }
 
-    ////////////////////
-    // тестируем производительность пакетной вставки
-    ////////////////////
-
-    public void testMultipleUpdate() {
-        List<Person> people = create1000people();
-        long before = System.currentTimeMillis();
-
-        for (Person person : people) {
-            jdbcTemplate.update("INSERT INTO Person (name, age, email, address) VALUES (?, ?, ?, ?)", person.getName(), person.getAge(),
-                    person.getEmail(), person.getAddress());
-        }
-
-        long after = System.currentTimeMillis();
-        System.out.println("Time: " + (after - before));
-    }
-
-    public void testBatchUpdate() {
-        List<Person> people = create1000people();
-
-        long before = System.currentTimeMillis();
-
-        jdbcTemplate.batchUpdate("INSERT INTO Person (name, age, email, address) VALUES (?, ?, ?, ?)",
-                new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                        preparedStatement.setString(1, people.get(i).getName());
-                        preparedStatement.setInt(2, people.get(i).getAge());
-                        preparedStatement.setString(3, people.get(i).getEmail());
-                        preparedStatement.setString(4, people.get(i).getAddress());
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return people.size();
-                    }
-                });
-
-        long after = System.currentTimeMillis();
-        System.out.println("Time: " + (after - before));
-    }
-
-    private List<Person> create1000people() {
-        List<Person> people = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            people.add(new Person(i, "Name " + i, 30, "test" + i + "@gmail.com", i + "some address"));
-        }
-        return people;
-    }
 }
