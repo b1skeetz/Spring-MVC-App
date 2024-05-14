@@ -1,6 +1,6 @@
 package energy_glow.util;
 
-import energy_glow.DAO.PersonDAO;
+import energy_glow.services.PeopleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -9,11 +9,11 @@ import org.springframework.validation.Validator;
 import energy_glow.Models.Person;
 @Component
 public class PersonValidator implements Validator {
-    private final PersonDAO personDAO;
+    private final PeopleService peopleService;
 
     @Autowired
-    public PersonValidator(PersonDAO personDAO){
-        this.personDAO = personDAO;
+    public PersonValidator(PeopleService peopleService){
+        this.peopleService = peopleService;
     }
 
     @Override
@@ -25,8 +25,8 @@ public class PersonValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Person person = (Person) target;
 
-        /*if(personDAO.show(person.getEmail()).isPresent()){
+        if(peopleService.findByEmail(person.getEmail()).isPresent()){
             errors.rejectValue("email", "500", "This email already exists");
-        }*/
+        }
     }
 }

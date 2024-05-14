@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -32,6 +33,7 @@ import java.util.Objects;
 @ComponentScan("energy_glow")
 @EnableWebMvc // mvc:annotation-driven
 @EnableTransactionManagement
+@EnableJpaRepositories("energy_glow.repositories")
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
 
@@ -66,11 +68,12 @@ public class SpringConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean managerFactory(){
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(){
         LocalContainerEntityManagerFactoryBean managerFactory = new LocalContainerEntityManagerFactoryBean();
         managerFactory.setPersistenceUnitName("default");
         managerFactory.setPackagesToScan("energy_glow");
         managerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        managerFactory.afterPropertiesSet();
 
         return managerFactory;
     }
@@ -79,7 +82,7 @@ public class SpringConfig implements WebMvcConfigurer {
     public PlatformTransactionManager transactionManager(){
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setPersistenceUnitName("default");
-        transactionManager.setEntityManagerFactory(managerFactory().getObject());
+        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 
         return transactionManager;
     }
