@@ -1,5 +1,6 @@
 package energy_glow.config;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -12,7 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -31,12 +34,10 @@ import java.util.Objects;
 @EnableTransactionManagement
 public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
-    private final Environment environment;
 
     @Autowired
-    public SpringConfig(ApplicationContext applicationContext, Environment environment){
+    public SpringConfig(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.environment = environment;
     }
 
     @Bean
@@ -64,33 +65,20 @@ public class SpringConfig implements WebMvcConfigurer {
         registry.viewResolver(resolver);
     }
 
-//    @Bean
-//    public DataSource dataSource(){
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//
-//        dataSource.setDriverClassName(Objects.requireNonNull(environment.getProperty("driver")));
-//        dataSource.setUrl(environment.getProperty("url"));
-//        dataSource.setUsername(environment.getProperty("username_value"));
-//        dataSource.setPassword(environment.getProperty("password"));
-//
-//        return dataSource;
-//    }
-
-//    @Bean
-//    public JdbcTemplate jdbcTemplate(){
-//        return new JdbcTemplate(dataSource());
-//    }
-
     @Bean
-    public LocalEntityManagerFactoryBean managerFactory(){
-        LocalEntityManagerFactoryBean managerFactory = new LocalEntityManagerFactoryBean();
+    public LocalContainerEntityManagerFactoryBean managerFactory(){
+        LocalContainerEntityManagerFactoryBean managerFactory = new LocalContainerEntityManagerFactoryBean();
         managerFactory.setPersistenceUnitName("default");
+        managerFactory.setPackagesToScan("energy_glow");
+        managerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+
         return managerFactory;
     }
 
     @Bean
     public PlatformTransactionManager transactionManager(){
         JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setPersistenceUnitName("default");
         transactionManager.setEntityManagerFactory(managerFactory().getObject());
 
         return transactionManager;

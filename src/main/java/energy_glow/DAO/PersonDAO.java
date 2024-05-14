@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@Transactional
 public class PersonDAO {
 
     private final EntityManagerFactory managerFactory;
@@ -40,12 +41,14 @@ public class PersonDAO {
     @Transactional
     public void save(Person person) {
         EntityManager manager = managerFactory.createEntityManager();
+        manager.joinTransaction();
         manager.persist(person);
     }
 
     @Transactional
     public void update(Long id, Person updatedPerson) {
         EntityManager manager = managerFactory.createEntityManager();
+        manager.joinTransaction();
         Query updatePerson = manager.createQuery("update Person p set " +
                 " p.age = :age," +
                 " p.name = :name," +
@@ -65,6 +68,7 @@ public class PersonDAO {
     @Transactional
     public void delete(Long id) {
         EntityManager manager = managerFactory.createEntityManager();
+        manager.joinTransaction();
         Person person = manager.createQuery("select p from Person p where p.id = :personId", Person.class)
                 .setParameter("personId", id).getSingleResult();
         manager.remove(person);
