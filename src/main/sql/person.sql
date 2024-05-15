@@ -16,3 +16,15 @@ VALUES ('Tom', 23, 'tom@mail.ru', 'USA, Los-Angeles, 054200'),
        ('John', 36, 'john@mail.ru', 'USA, Florida, 496002');
 
 select * from Person;
+
+drop table item;
+create table Item(
+    id serial8 primary key,
+    person_id int8,
+    item_name varchar(100) not null,
+    foreign key (person_id) references Person (id) on delete set null
+);
+
+insert into Item (person_id, item_name) VALUES (6, 'Airpods'),
+                                               (6, 'PlayStation'),
+                                               (6, 'TV');

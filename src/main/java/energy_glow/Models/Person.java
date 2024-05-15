@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -34,6 +36,9 @@ public class Person {
             "Country, City, Postal Code (6 digits)")
     @Column(name = "address")
     private String address;
+
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    private List<Item> items;
 
     public Person() {
 
