@@ -1,6 +1,7 @@
 package energy_glow.controllers;
 
 import energy_glow.Models.Person;
+import energy_glow.services.ItemsService;
 import energy_glow.services.PeopleService;
 import energy_glow.util.PersonValidator;
 import jakarta.validation.Valid;
@@ -14,17 +15,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/people")
 public class PeopleController {
     private final PeopleService peopleService;
+    private final ItemsService itemsService;
     private final PersonValidator personValidator;
 
     @Autowired
-    public PeopleController(PeopleService peopleService, PersonValidator personValidator) {
+    public PeopleController(PeopleService peopleService, ItemsService itemsService, PersonValidator personValidator) {
         this.peopleService = peopleService;
+        this.itemsService = itemsService;
         this.personValidator = personValidator;
     }
 
     @GetMapping()
     public String index(Model model){
         model.addAttribute("people", peopleService.findAll());
+
+        itemsService.findByItemName("Airpods");
+        itemsService.findByOwner(peopleService.findAll().get(0));
+
+        peopleService.test();
+
         return "people/index";
     }
 
