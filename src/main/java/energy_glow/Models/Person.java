@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -36,6 +38,15 @@ public class Person {
             "Country, City, Postal Code (6 digits)")
     @Column(name = "address")
     private String address;
+
+    @Column(name = "date_of_birth")
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateOfBirth;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
     @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private List<Item> items;

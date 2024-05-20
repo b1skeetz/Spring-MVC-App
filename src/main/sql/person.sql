@@ -28,3 +28,7 @@ create table Item(
 insert into Item (person_id, item_name) VALUES (6, 'Airpods'),
                                                (6, 'PlayStation'),
                                                (6, 'TV');
+
+alter table Person add column date_of_birth date;
+
+alter table Person add column created_at timestamp;
