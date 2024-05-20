@@ -32,3 +32,9 @@ insert into Item (person_id, item_name) VALUES (6, 'Airpods'),
 alter table Person add column date_of_birth date;
 
 alter table Person add column created_at timestamp;
+
+alter table Person add column mood int;
+
+alter table Person drop column mood;
+
+alter table Person add column mood varchar;

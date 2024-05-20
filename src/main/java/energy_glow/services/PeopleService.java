@@ -1,5 +1,6 @@
 package energy_glow.services;
 
+import energy_glow.Models.Mood;
 import energy_glow.Models.Person;
 import energy_glow.repositories.PeopleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class PeopleService {
     @Transactional
     public void save(Person person){
         person.setCreatedAt(new Date());
+        person.setMood(Mood.CALM);
         peopleRepository.save(person);
     }
 
