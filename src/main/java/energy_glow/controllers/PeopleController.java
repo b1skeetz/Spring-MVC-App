@@ -1,5 +1,6 @@
 package energy_glow.controllers;
 
+import energy_glow.DAO.PersonDAO;
 import energy_glow.Models.Person;
 import energy_glow.services.ItemsService;
 import energy_glow.services.PeopleService;
@@ -17,22 +18,27 @@ public class PeopleController {
     private final PeopleService peopleService;
     private final ItemsService itemsService;
     private final PersonValidator personValidator;
+    private final PersonDAO personDAO;
 
     @Autowired
-    public PeopleController(PeopleService peopleService, ItemsService itemsService, PersonValidator personValidator) {
+    public PeopleController(PeopleService peopleService, ItemsService itemsService,
+                            PersonValidator personValidator, PersonDAO personDAO) {
         this.peopleService = peopleService;
         this.itemsService = itemsService;
         this.personValidator = personValidator;
+        this.personDAO = personDAO;
     }
 
     @GetMapping()
     public String index(Model model){
-        model.addAttribute("people", peopleService.findAll());
+//        model.addAttribute("people", peopleService.findAll());
+//
+//        itemsService.findByItemName("Airpods");
+//        itemsService.findByOwner(peopleService.findAll().get(0));
+//
+//        peopleService.test();
 
-        itemsService.findByItemName("Airpods");
-        itemsService.findByOwner(peopleService.findAll().get(0));
-
-        peopleService.test();
+        personDAO.testNPlus1();
 
         return "people/index";
     }
