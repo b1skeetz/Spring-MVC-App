@@ -31,14 +31,14 @@ public class PeopleController {
 
     @GetMapping()
     public String index(Model model){
-//        model.addAttribute("people", peopleService.findAll());
-//
-//        itemsService.findByItemName("Airpods");
-//        itemsService.findByOwner(peopleService.findAll().get(0));
-//
-//        peopleService.test();
+        model.addAttribute("people", peopleService.findAll());
 
-        personDAO.testNPlus1();
+        itemsService.findByItemName("Airpods");
+        itemsService.findByOwner(peopleService.findAll().get(0));
+
+        peopleService.test();
+
+        //personDAO.testNPlus1();
 
         return "people/index";
     }
