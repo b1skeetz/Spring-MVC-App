@@ -24,6 +24,7 @@ public class BatchController {
     @GetMapping("/without")
     public String withoutBatch(){
         //personDAO.testMultipleUpdate();
+
         return "redirect:/people";
     }
 
